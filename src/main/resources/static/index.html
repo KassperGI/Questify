@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Questify</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+</head>
+<body>
+
+<header class="top-nav">
+    <button id="about-button" class="icon-button">?</button>
+    <button id="mute-button" class="icon-button"></button>
+
+    <div id="logged-out-view">
+        <button id="login-nav-button">Login</button>
+    </div>
+
+    <div id="logged-in-view" class="hidden">
+        <button id="profile-nav-button">Profile</button>
+        <div id="profile-dropdown" class="hidden">
+            <div id="dropdown-username">Player Name</div>
+            <div class="xp-container-horizontal">
+                <div id="xp-level">Lvl 1</div>
+                <div class="xp-bar-horizontal">
+                    <div id="xp-bar-fill"></div>
+                </div>
+            </div>
+            <div id="dropdown-xp-text">0/100 XP</div>
+            <div id="dropdown-gold">Gold: 0</div>
+            <button id="dropdown-achievements">Achievements</button>
+            <button id="logout-button">Logout</button>
+        </div>
+    </div>
+</header>
+
+<main id="start-screen" class="screen">
+    <h1>Questify</h1>
+    <button id="start-game-button">Start Game</button>
+    <button id="settings-button">Settings</button>
+</main>
+
+<div id="game-menu-screen" class="screen hidden">
+    <h1>Questify</h1>
+    <button id="resume-game-button">Resume Game</button>
+    <button id="new-game-button">New Game</button>
+    <button id="settings-button-ingame">Settings</button>
+</div>
+
+<div id="login-screen" class="screen hidden">
+    <div class="login-container">
+        <h2>Enter the Realm</h2>
+        <form id="login-form">
+            <label for="username">Username:</label>
+            <input type="text" id="username" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" required>
+            <button type="submit" class="form-button" id="login-main-button">Login</button>
+            <button type="button" id="show-signup-button" class="form-button">Sign Up</button>
+        </form>
+        <button id="back-button">Back</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
