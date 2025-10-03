@@ -21,7 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const logoutButton = document.getElementById("logout-button");
   const muteButton = document.getElementById("mute-button");
   const aboutButton = document.getElementById("about-button");
-  const dropdownAchievements = document.getElementById("dropdown-achievements");
 
   const profileDropdown = document.getElementById("profile-dropdown");
   const dropdownUsername = document.getElementById("dropdown-username");
@@ -29,6 +28,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const xpBarFill = document.getElementById("xp-bar-fill");
   const dropdownXpText = document.getElementById("dropdown-xp-text");
   const dropdownGold = document.getElementById("dropdown-gold");
+
+  const dropdownAchievements = document.getElementById("dropdown-achievements");
+  const achievementsScreen = document.getElementById("achievements-screen");
+  const achievementsBackButton = document.getElementById("achievements-back-button");
 
   // helper: safe class toggles
   function showDropdown() {
@@ -44,41 +47,52 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // UI update based on localStorage
   function updateUI() {
-    const playerString = localStorage.getItem("questifyPlayer");
-    if (playerString) {
-      const player = JSON.parse(playerString);
+      const playerString = localStorage.getItem("questifyPlayer");
+      if (playerString) {
+          const player = JSON.parse(playerString);
 
-      startScreen?.classList.add("hidden");
-      loginScreen?.classList.add("hidden");
-      gameMenuScreen?.classList.remove("hidden");
+          // --- THIS IS THE NEW LOGIC ---
+          // Check if the player has made progress (level > 1)
+          if (player.level > 1) {
+              // Player is returning, show the resume menu
+              startScreen?.classList.add("hidden");
+              gameMenuScreen?.classList.remove("hidden");
+          } else {
+              // Player is new or has no progress, show the start menu
+              startScreen?.classList.remove("hidden");
+              gameMenuScreen?.classList.add("hidden");
+          }
 
-      loggedOutView?.classList.add("hidden");
-      loggedInView?.classList.remove("hidden");
+          // Hide the login screen since we are logged in
+          loginScreen?.classList.add("hidden");
 
-      // fill dropdown values safely
-      dropdownUsername && (dropdownUsername.textContent = player.username ?? "Player");
-      dropdownGold && (dropdownGold.textContent = `Gold: ${player.gold ?? 0}`);
-      const level = player.level ?? 1;
-      xpLevelEl && (xpLevelEl.textContent = `Lvl ${level}`);
-      const xpNeeded = level * 100;
-      const xp = player.xp ?? 0;
-      const pct = Math.max(0, Math.min(100, (xp / xpNeeded) * 100));
-      xpBarFill && (xpBarFill.style.width = `${pct}%`);
-      dropdownXpText && (dropdownXpText.textContent = `${xp} / ${xpNeeded} XP`);
+          // The rest of the function remains the same
+          loggedOutView?.classList.add("hidden");
+          loggedInView?.classList.remove("hidden");
 
-      // ensure dropdown hidden after UI update
-      hideDropdown();
-    } else {
-      // logged out state
-      startScreen?.classList.remove("hidden");
-      loginScreen?.classList.add("hidden");
-      gameMenuScreen?.classList.add("hidden");
+          // fill dropdown values safely
+          dropdownUsername && (dropdownUsername.textContent = player.username ?? "Player");
+          dropdownGold && (dropdownGold.textContent = `Gold: ${player.gold ?? 0}`);
+          const level = player.level ?? 1;
+          xpLevelEl && (xpLevelEl.textContent = `Lvl ${level}`);
+          const xpNeeded = level * 100;
+          const xp = player.xp ?? 0;
+          const pct = Math.max(0, Math.min(100, (xp / xpNeeded) * 100));
+          xpBarFill && (xpBarFill.style.width = `${pct}%`);
+          dropdownXpText && (dropdownXpText.textContent = `${xp} / ${xpNeeded} XP`);
 
-      loggedOutView?.classList.remove("hidden");
-      loggedInView?.classList.add("hidden");
+          hideDropdown();
+      } else {
+          // logged out state
+          startScreen?.classList.remove("hidden");
+          loginScreen?.classList.add("hidden");
+          gameMenuScreen?.classList.add("hidden");
 
-      hideDropdown();
-    }
+          loggedOutView?.classList.remove("hidden");
+          loggedInView?.classList.add("hidden");
+
+          hideDropdown();
+      }
   }
 
   // --- Event listeners ---
@@ -182,6 +196,17 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.removeItem("questifyPlayer");
     hideDropdown();
     updateUI();
+  });
+
+  dropdownAchievements?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      hideDropdown(); // First, close the profile dropdown
+      achievementsScreen?.classList.remove("hidden"); // Then, show the achievements screen
+  });
+
+  // ADD this new event listener for the 'Back' button
+  achievementsBackButton?.addEventListener("click", () => {
+      achievementsScreen?.classList.add("hidden"); // Hide the achievements screen
   });
 
   // Back from login

@@ -277,3 +277,77 @@ h2 {
     border: 1px solid #1a1a2e;
     transform: translate(-50%, -50%) rotate(45deg);
 }
+/* --- Achievements Screen --- */
+.achievements-container {
+    background-color: rgba(44, 62, 80, 0.85);
+    padding: 30px 40px;
+    border: 2px solid #3498db;
+    width: 600px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#achievements-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+    overflow-y: auto; /* Adds a scrollbar if the list is too long */
+    text-align: left;
+}
+
+.achievement-item {
+    display: flex;
+    align-items: center;
+    background-color: #1a1a2e;
+    border: 2px solid #4e4e6a;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.achievement-icon {
+    font-size: 40px;
+    margin-right: 20px;
+}
+
+.achievement-details {
+    flex-grow: 1;
+}
+
+.achievement-title {
+    font-size: 16px;
+    color: #f7b733;
+    margin-bottom: 5px;
+}
+
+.achievement-desc {
+    font-size: 12px;
+    color: #9a9ac5;
+}
+
+/* Styling for locked vs. unlocked items */
+.achievement-item.locked {
+    opacity: 0.5;
+}
+
+.achievement-item.unlocked .achievement-icon {
+    filter: drop-shadow(0 0 5px #f7b733);
+}
+
+#achievements-back-button {
+    font-family: 'Press Start 2P', cursive;
+    width: 150px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #e74c3c;
+    border: 2px solid #f7b733;
+    color: #ffffff;
+    cursor: pointer;
+    margin-top: 10px;
+    align-self: center; /* Centers the button */
+}
+
+#achievements-back-button:hover {
+    background-color: #3498db;
+    color: #ffffff;
+}
