@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const dropdownGold = document.getElementById("dropdown-gold");
 
   const dropdownAchievements = document.getElementById("dropdown-achievements");
+  console.log("Found Achievements Button:", dropdownAchievements);
   const achievementsScreen = document.getElementById("achievements-screen");
   const achievementsBackButton = document.getElementById("achievements-back-button");
 
@@ -38,6 +39,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!profileDropdown || !profileButton) return;
     profileDropdown.classList.add("show");
     profileButton.classList.add("active");
+  }
+  function showGameScreen() {
+      console.log("1. 'showGameScreen' function has started.");
+
+      startScreen?.classList.add("hidden");
+      gameMenuScreen?.classList.add("hidden");
+
+      const gameContentScreen = document.getElementById("game-content-screen");
+      console.log("2. Looking for 'game-content-screen'. Found:", gameContentScreen);
+
+      gameContentScreen?.classList.remove("hidden");
+      console.log("3. 'hidden' class should now be removed.");
   }
   function hideDropdown() {
     if (!profileDropdown || !profileButton) return;
@@ -104,18 +117,20 @@ document.addEventListener("DOMContentLoaded", () => {
     loginScreen?.classList.remove("hidden");
     hideDropdown();
   }
-  startGameButton?.addEventListener("click", showLogin);
+  startGameButton?.addEventListener("click", () => {
+      const playerString = localStorage.getItem("questifyPlayer");
+      if (playerString) {
+          // If the player is logged in, go to the main game screen
+          showGameScreen();
+      } else {
+          // If the player is NOT logged in, show the login form
+          showLogin();
+      }
+  });
   loginNavButton?.addEventListener("click", showLogin);
 
   // Resume Game (go to game content)
-  resumeGameButton?.addEventListener("click", () => {
-    gameMenuScreen?.classList.add("hidden");
-    if (gameContentScreen) {
-      gameContentScreen.classList.remove("hidden");
-    } else {
-      alert("Resume: game content not implemented yet.");
-    }
-  });
+  resumeGameButton?.addEventListener("click", showGameScreen);
 
   // Quit to menu from placeholder game content
   document.getElementById("quit-to-menu")?.addEventListener("click", () => {

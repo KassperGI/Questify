@@ -60,4 +60,8 @@ public class TaskService {
 
         return taskRepository.save(task);
     }
+    // Add this method inside your TaskService class
+    public List<Task> getTasksByPlayerId(Long playerId) {
+        return taskRepository.findByPlayerId(playerId);
+    }
 }

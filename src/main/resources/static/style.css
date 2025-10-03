@@ -351,3 +351,128 @@ h2 {
     background-color: #3498db;
     color: #ffffff;
 }
+/* --- Main Game Screen --- */
+#game-content-screen {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 40px;
+    padding: 20px;
+    padding-top: 100px; /* Space for the top nav bar */
+}
+
+#player-panel, #quest-panel {
+    background-color: rgba(44, 62, 80, 0.7);
+    border: 2px solid #3498db;
+    padding: 20px;
+}
+
+/* --- Player Panel (Left Side) --- */
+#player-panel {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#player-sprite {
+    width: 150px;
+    height: 150px;
+    background-color: #1a1a2e;
+    border: 2px solid #9a9ac5;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 80px;
+}
+#player-sprite::after {
+    content: '👤'; /* Placeholder character sprite */
+}
+
+#player-name {
+    font-size: 20px;
+    color: #f7b733;
+    margin-bottom: 20px;
+}
+
+.xp-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#player-level {
+    font-size: 14px;
+}
+
+.xp-bar {
+    flex-grow: 1;
+    height: 25px;
+    border: 2px solid #9a9ac5;
+    background-color: #1a1a2e;
+}
+
+#player-xp-fill {
+    height: 100%;
+    width: 50%; /* Example fill */
+    background-color: #3498db;
+}
+
+#player-xp-text, #player-gold {
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+/* --- Quest Panel (Right Side) --- */
+#quest-panel {
+    width: 700px;
+    display: flex;
+    flex-direction: column;
+}
+
+#quest-board, #my-tasks {
+    margin-bottom: 20px;
+}
+
+#quest-list, #task-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 2px solid #1a1a2e;
+    padding: 10px;
+    background-color: rgba(0,0,0,0.2);
+}
+
+.add-task-container {
+    display: flex;
+    margin-top: 15px;
+}
+
+#new-task-input {
+    flex-grow: 1;
+    padding: 10px;
+    background-color: #1a1a2e;
+    border: 2px solid #3498db;
+    color: #ffffff;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 14px;
+}
+
+#add-task-button {
+    width: 50px;
+    height: 50px;
+    font-size: 30px;
+    border: 2px solid #3498db;
+    background-color: #2c3e50;
+    color: #3498db;
+    cursor: pointer;
+}
+#add-task-button:hover {
+    background-color: #3498db;
+    color: #ffffff;
+}

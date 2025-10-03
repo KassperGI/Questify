@@ -31,4 +31,8 @@ public class TaskController {
     public Task completeTask(@PathVariable Long taskId) {
         return taskService.completeTask(taskId);
     }
+    @GetMapping("/player/{playerId}")
+    public List<Task> getTasksByPlayer(@PathVariable Long playerId) {
+        return taskService.getTasksByPlayerId(playerId);
+    }
 }
