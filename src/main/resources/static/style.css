@@ -14,7 +14,7 @@ body {
     text-align: center;
     margin: 0;
     padding: 0;
-    overflow: hidden;
+    position: relative;
 }
 
 h1 {
@@ -33,7 +33,7 @@ h2 {
 
 /* --- Navigation Bar --- */
 .top-nav {
-    position: absolute;
+    position: fixed;
     top: 20px;
     right: 20px;
     display: flex;
@@ -76,13 +76,22 @@ h2 {
 
 /* --- Main Menu & Screens --- */
 .screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 100vh;
+
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-}
 
+    /* These lines will add a nice fade effect between screens */
+    opacity: 1;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+}
 #start-screen button, #game-menu-screen button {
     font-family: 'Press Start 2P', cursive;
     font-size: 24px;
@@ -119,7 +128,8 @@ h2 {
 }
 
 .hidden {
-    display: none;
+    opacity: 0;
+    pointer-events: none; /* Prevents clicking on invisible screens */
 }
 
 /* --- Login Screen Styles --- */
@@ -164,6 +174,9 @@ h2 {
     background-color: #2c3e50;
     border: 2px solid #3498db;
     color: #3498db;
+}
+#login-screen, #achievements-screen {
+    z-index: 5; /* This is higher than the main screens (1), but lower than the header (10) */
 }
 
 #show-signup-button {
@@ -428,8 +441,12 @@ h2 {
 /* --- Quest Panel (Right Side) --- */
 #quest-panel {
     width: 700px;
-    display: flex;
-    flex-direction: column;
+    display: flex; /* This is new */
+    flex-direction: column; /* This is new */
+    max-height: 80vh; /* Give the whole panel a max height */
+    background-color: rgba(44, 62, 80, 0.7);
+    border: 2px solid #3498db;
+    padding: 20px;
 }
 
 #quest-board, #my-tasks {
@@ -438,15 +455,14 @@ h2 {
 
 #quest-list, #task-list {
     list-style: none;
-    padding: 0;
-    margin-top: 15px;
-    max-height: 200px;
-    overflow-y: auto;
-    border: 2px solid #1a1a2e;
     padding: 10px;
+    margin-top: 15px;
+    max-height: 160px; /* Reduced the max height to force scrolling sooner */
+    overflow-y: auto; /* This will create a scrollbar inside the list */
+    border: 2px solid #1a1a2e;
     background-color: rgba(0,0,0,0.2);
+    text-align: left; /* Keep the left alignment */
 }
-
 .add-task-container {
     display: flex;
     margin-top: 15px;
