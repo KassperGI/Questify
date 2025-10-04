@@ -176,25 +176,29 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateUI() {
       const playerString = localStorage.getItem("questifyPlayer");
       if (playerString) {
-          // --- LOGGED IN STATE ---
           const player = JSON.parse(playerString);
 
+          // --- THIS IS THE NEW LOGIC ---
+          // Check if the player has made progress (level > 1)
           if (player.level > 1) {
+              // Player is returning, show the resume menu
               startScreen?.classList.add("hidden");
               gameMenuScreen?.classList.remove("hidden");
           } else {
+              // Player is new or has no progress, show the start menu
               startScreen?.classList.remove("hidden");
               gameMenuScreen?.classList.add("hidden");
           }
+
+          // Hide the login screen since we are logged in
           loginScreen?.classList.add("hidden");
 
-          // Updated logic for the new header structure
-          loginNavButton?.classList.add("hidden");
+          // The rest of the function remains the same
+          loggedOutView?.classList.add("hidden");
           loggedInView?.classList.remove("hidden");
 
-          // fill dropdown values
+          // fill dropdown values safely
           dropdownUsername && (dropdownUsername.textContent = player.username ?? "Player");
-          // ... (rest of the dropdown update code is the same) ...
           dropdownGold && (dropdownGold.textContent = `Gold: ${player.gold ?? 0}`);
           const level = player.level ?? 1;
           xpLevelEl && (xpLevelEl.textContent = `Lvl ${level}`);
@@ -206,15 +210,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
           hideDropdown();
       } else {
-          // --- LOGGED OUT STATE ---
+          // logged out state
           startScreen?.classList.remove("hidden");
           loginScreen?.classList.add("hidden");
           gameMenuScreen?.classList.add("hidden");
-          achievementsScreen?.classList.add("hidden"); // Correctly hide achievements
-          gameContentScreen?.classList.add("hidden");  // Correctly hide game content
 
-          // Updated logic for the new header structure
-          loginNavButton?.classList.remove("hidden");
+          loggedOutView?.classList.remove("hidden");
           loggedInView?.classList.add("hidden");
 
           hideDropdown();
