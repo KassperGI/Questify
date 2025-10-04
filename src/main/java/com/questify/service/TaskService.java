@@ -5,8 +5,12 @@ import com.questify.Task;
 import com.questify.repository.PlayerRepository;
 import com.questify.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskService {
@@ -28,13 +32,14 @@ public class TaskService {
     public Task createTaskForPlayer(Long playerId, Task task) {
         // Find the player by their ID
         Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new RuntimeException("Player not found with id: " + playerId));
-
-        // Link the new task to the player we found
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found"));
         task.setPlayer(player);
-
-        // Save the task, now with its owner
         return taskRepository.save(task);
+    }
+    public List<Task> getQuestBoardTasks() {
+        List<Task> allQuests = taskRepository.findByPlayerIsNull();
+        Collections.shuffle(allQuests); // Randomize the list
+        return allQuests.stream().limit(4).collect(Collectors.toList()); // Return the first 4
     }
 
     public List<Task> getAllTasks() {

@@ -18,7 +18,7 @@ public class TaskController {
     }
 
     // The URL now includes a placeholder for the player's ID
-    @PostMapping("/{playerId}/create")
+    @PostMapping("/player/{playerId}/create")
     public Task createTask(@PathVariable Long playerId, @RequestBody Task task) {
         return taskService.createTaskForPlayer(playerId, task);
     }
@@ -34,5 +34,9 @@ public class TaskController {
     @GetMapping("/player/{playerId}")
     public List<Task> getTasksByPlayer(@PathVariable Long playerId) {
         return taskService.getTasksByPlayerId(playerId);
+    }
+    @GetMapping("/quest-board")
+    public List<Task> getQuestBoardTasks() {
+        return taskService.getQuestBoardTasks();
     }
 }

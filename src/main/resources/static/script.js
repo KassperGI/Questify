@@ -34,6 +34,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const achievementsScreen = document.getElementById("achievements-screen");
   const achievementsBackButton = document.getElementById("achievements-back-button");
 
+  const newTaskInput = document.getElementById("new-task-input");
+  const addTaskButton = document.getElementById("add-task-button");
+
   // helper: safe class toggles
   function showDropdown() {
     if (!profileDropdown || !profileButton) return;
@@ -41,21 +44,132 @@ document.addEventListener("DOMContentLoaded", () => {
     profileButton.classList.add("active");
   }
   function showGameScreen() {
-      console.log("1. 'showGameScreen' function has started.");
-
       startScreen?.classList.add("hidden");
       gameMenuScreen?.classList.add("hidden");
-
       const gameContentScreen = document.getElementById("game-content-screen");
-      console.log("2. Looking for 'game-content-screen'. Found:", gameContentScreen);
-
       gameContentScreen?.classList.remove("hidden");
-      console.log("3. 'hidden' class should now be removed.");
+      loadGameData();
   }
   function hideDropdown() {
     if (!profileDropdown || !profileButton) return;
     profileDropdown.classList.remove("show");
     profileButton.classList.remove("active");
+  }
+  async function loadGameData() {
+      const playerString = localStorage.getItem("questifyPlayer");
+      if (!playerString) return;
+      const player = JSON.parse(playerString);
+
+      // --- Part 1: Update the Player Stats Panel ---
+      const playerName = document.getElementById("player-name");
+      const playerLevel = document.getElementById("player-level");
+      const playerXpText = document.getElementById("player-xp-text");
+      const playerGold = document.getElementById("player-gold"); // <-- THIS LINE WAS LIKELY MISSING
+      const playerXpFill = document.getElementById("player-xp-fill");
+
+      playerName.textContent = player.username;
+      playerLevel.textContent = `Lvl ${player.level}`;
+      playerGold.textContent = `Gold: ${player.gold}`;
+      const xpNeeded = player.level * 100;
+      playerXpText.textContent = `${player.xp} / ${xpNeeded} XP`;
+      playerXpFill.style.width = `${(player.xp / xpNeeded) * 100}%`;
+
+      // --- Part 2: Fetch and Display Tasks ---
+      const taskList = document.getElementById("task-list");
+      const questList = document.getElementById("quest-list");
+      taskList.innerHTML = "<li>Loading...</li>";
+      questList.innerHTML = "<li>Loading...</li>";
+
+      try {
+          const [myTasksResponse, questBoardResponse] = await Promise.all([
+              fetch(`http://localhost:8080/api/tasks/player/${player.id}`),
+              fetch(`http://localhost:8080/api/tasks/quest-board`)
+          ]);
+
+          if (!myTasksResponse.ok) throw new Error("Failed to fetch player tasks.");
+          if (!questBoardResponse.ok) throw new Error("Failed to fetch quest board.");
+
+          const myTasks = await myTasksResponse.json();
+          const questBoardTasks = await questBoardResponse.json();
+
+          // (The rest of the function to display tasks is the same as the one I sent before)
+          // ...
+           // --- Display "My Tasks" ---
+          taskList.innerHTML = "";
+          if (myTasks.length === 0) {
+              taskList.innerHTML = "<li>No active tasks. Add one below!</li>";
+          } else {
+              myTasks.forEach(task => {
+                  const li = document.createElement("li");
+                  li.className = 'task-item';
+                  const taskText = document.createElement('span');
+                  taskText.textContent = task.description;
+                  const completeButton = document.createElement('button');
+                  completeButton.textContent = '✓';
+                  completeButton.className = 'complete-btn';
+                  completeButton.addEventListener('click', async () => {
+                      try {
+                          const completeResponse = await fetch(`http://localhost:8080/api/tasks/${task.id}/complete`, {
+                              method: 'POST'
+                          });
+                          if (!completeResponse.ok) throw new Error('Failed to complete task.');
+
+                          const updatedPlayer = await completeResponse.json();
+                          localStorage.setItem('questifyPlayer', JSON.stringify(updatedPlayer));
+                          loadGameData();
+
+                      } catch (error) {
+                          console.error('Error completing task:', error);
+                          alert('Could not complete the task.');
+                      }
+                   });
+                  li.appendChild(taskText);
+                  li.appendChild(completeButton);
+                  taskList.appendChild(li);
+              });
+          }
+
+          // --- Display "Quest Board" Tasks ---
+          questList.innerHTML = "";
+          if (questBoardTasks.length === 0) {
+              questList.innerHTML = "<li>No quests available right now.</li>";
+          } else {
+              questBoardTasks.forEach(quest => {
+                  const li = document.createElement("li");
+                  li.className = 'task-item';
+
+                  const questText = document.createElement('span');
+                  questText.textContent = quest.description;
+
+                  const acceptButton = document.createElement('button');
+                  acceptButton.textContent = 'Accept';
+                  acceptButton.className = 'accept-btn';
+
+                  acceptButton.addEventListener('click', async () => {
+                      const taskData = { description: quest.description };
+                      const response = await fetch(`http://localhost:8080/api/tasks/player/${player.id}/create`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify(taskData)
+                      });
+                      if (response.ok) {
+                          loadGameData();
+                      } else {
+                          alert("Failed to accept quest.");
+                      }
+                  });
+
+                  li.appendChild(questText);
+                  li.appendChild(acceptButton);
+                  questList.appendChild(li);
+              });
+          }
+
+      } catch (error) {
+          console.error("Error loading data:", error);
+          taskList.innerHTML = "<li>Error loading tasks.</li>";
+          questList.innerHTML = "<li>Error loading quests.</li>";
+      }
   }
 
   // UI update based on localStorage
@@ -149,6 +263,39 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!profileDropdown) return;
     profileDropdown.classList.toggle("show");
     profileButton.classList.toggle("active");
+  });
+
+  addTaskButton?.addEventListener("click", async () => {
+      const description = newTaskInput.value.trim();
+      if (!description) {
+          alert("Task description cannot be empty.");
+          return;
+      }
+
+      const playerString = localStorage.getItem("questifyPlayer");
+      if (!playerString) return;
+      const player = JSON.parse(playerString);
+
+      const taskData = { description: description };
+
+      try {
+          const response = await fetch(`http://localhost:8080/api/tasks/player/${player.id}/create`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(taskData)
+          });
+
+          if (!response.ok) {
+              throw new Error("Failed to add task.");
+          }
+
+          newTaskInput.value = ""; // Clear the input box
+          loadGameData(); // Reload the task list to show the new task
+
+      } catch (error) {
+          console.error("Error adding task:", error);
+          alert("Could not add task.");
+      }
   });
 
   // Auto-close dropdown on outside click

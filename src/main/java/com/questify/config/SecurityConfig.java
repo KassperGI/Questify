@@ -24,10 +24,17 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                // Allow access to static files, the main page, and our API endpoints
-                                .requestMatchers("/", "/index.html", "/style.css", "/script.js").permitAll()
-                                .requestMatchers("/fonts/**").permitAll() // Allow fonts
+                                // Allow access to static files
+                                .requestMatchers("/", "/index.html", "/style.css", "/script.js", "/fonts/**").permitAll()
+
+                                // Allow access to login/signup
                                 .requestMatchers("/api/players/login", "/api/players/create").permitAll()
+
+                                // --- ADD THESE TWO LINES ---
+                                .requestMatchers("/api/tasks/quest-board").permitAll() // For the random quests
+                                .requestMatchers("/api/tasks/player/**").permitAll()   // For the player's personal tasks
+
+                                // Allow access to the H2 console
                                 .requestMatchers("/h2-console/**").permitAll()
 
                                 // All other requests should be authenticated

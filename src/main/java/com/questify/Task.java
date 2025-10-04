@@ -3,6 +3,7 @@ package com.questify;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Data
 @Entity
@@ -24,6 +25,7 @@ public class Task {
     @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "player_id")
+    @JsonIgnore
     private Player player;
     public Task() {
         // Default constructor needed by JPA

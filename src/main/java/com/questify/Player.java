@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 // @Data is from Lombok and automatically writes getter/setter methods for us. ✨
 @Data
@@ -27,5 +28,6 @@ public class Player {
     // Inside the Player class, after private int gold = 0;
     @JsonManagedReference
     @OneToMany(mappedBy = "player")
+    @JsonIgnore
     private List<Task> tasks;
 }
