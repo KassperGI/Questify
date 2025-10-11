@@ -60,11 +60,11 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!playerString) return;
       const player = JSON.parse(playerString);
 
-      // --- Part 1: Update the Player Stats Panel ---
+      // --- Part 1: Update Player Stats ---
       const playerName = document.getElementById("player-name");
       const playerLevel = document.getElementById("player-level");
       const playerXpText = document.getElementById("player-xp-text");
-      const playerGold = document.getElementById("player-gold"); // <-- THIS LINE WAS LIKELY MISSING
+      const playerGold = document.getElementById("player-gold");
       const playerXpFill = document.getElementById("player-xp-fill");
 
       playerName.textContent = player.username;
@@ -74,7 +74,8 @@ document.addEventListener("DOMContentLoaded", () => {
       playerXpText.textContent = `${player.xp} / ${xpNeeded} XP`;
       playerXpFill.style.width = `${(player.xp / xpNeeded) * 100}%`;
 
-      // --- Part 2: Fetch and Display Tasks ---
+
+      // --- Part 2: Fetch BOTH Task Lists ---
       const taskList = document.getElementById("task-list");
       const questList = document.getElementById("quest-list");
       taskList.innerHTML = "<li>Loading...</li>";
@@ -92,9 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const myTasks = await myTasksResponse.json();
           const questBoardTasks = await questBoardResponse.json();
 
-          // (The rest of the function to display tasks is the same as the one I sent before)
-          // ...
-           // --- Display "My Tasks" ---
+          // Display "My Tasks"
           taskList.innerHTML = "";
           if (myTasks.length === 0) {
               taskList.innerHTML = "<li>No active tasks. Add one below!</li>";
@@ -113,11 +112,9 @@ document.addEventListener("DOMContentLoaded", () => {
                               method: 'POST'
                           });
                           if (!completeResponse.ok) throw new Error('Failed to complete task.');
-
                           const updatedPlayer = await completeResponse.json();
                           localStorage.setItem('questifyPlayer', JSON.stringify(updatedPlayer));
                           loadGameData();
-
                       } catch (error) {
                           console.error('Error completing task:', error);
                           alert('Could not complete the task.');
@@ -129,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
               });
           }
 
-          // --- Display "Quest Board" Tasks ---
+          // Display "Quest Board"
           questList.innerHTML = "";
           if (questBoardTasks.length === 0) {
               questList.innerHTML = "<li>No quests available right now.</li>";
@@ -137,14 +134,11 @@ document.addEventListener("DOMContentLoaded", () => {
               questBoardTasks.forEach(quest => {
                   const li = document.createElement("li");
                   li.className = 'task-item';
-
                   const questText = document.createElement('span');
                   questText.textContent = quest.description;
-
                   const acceptButton = document.createElement('button');
                   acceptButton.textContent = 'Accept';
                   acceptButton.className = 'accept-btn';
-
                   acceptButton.addEventListener('click', async () => {
                       const taskData = { description: quest.description };
                       const response = await fetch(`http://localhost:8080/api/tasks/player/${player.id}/create`, {
@@ -158,13 +152,11 @@ document.addEventListener("DOMContentLoaded", () => {
                           alert("Failed to accept quest.");
                       }
                   });
-
                   li.appendChild(questText);
                   li.appendChild(acceptButton);
                   questList.appendChild(li);
               });
           }
-
       } catch (error) {
           console.error("Error loading data:", error);
           taskList.innerHTML = "<li>Error loading tasks.</li>";

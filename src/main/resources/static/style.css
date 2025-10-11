@@ -511,3 +511,29 @@ h2 {
 .accept-btn:hover {
     background-color: #4e9fe1;
 }
+
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #2c3e50;
+    padding: 15px;
+    border: 1px solid #4e4e6a;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.complete-btn {
+    font-family: 'Press Start 2P', cursive;
+    background-color: #27ae60;
+    color: white;
+    border: 1px solid #2ecc71;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+.complete-btn:hover {
+    background-color: #2ecc71;
+}

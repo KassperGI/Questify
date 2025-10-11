@@ -8,65 +8,53 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import java.util.List;
+
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class TaskService {
 
     private final TaskRepository taskRepository;
-    private final PlayerRepository playerRepository; // We add the PlayerRepository
-    private final PlayerService playerService; // NEW: Add PlayerService
+    private final PlayerRepository playerRepository;
+    private final PlayerService playerService; // Injected PlayerService
 
     @Autowired
-    public TaskService(TaskRepository taskRepository, PlayerRepository playerRepository, PlayerService playerService) {// NEW: Add PlayerService here
+    public TaskService(TaskRepository taskRepository, PlayerRepository playerRepository, PlayerService playerService) {
         this.taskRepository = taskRepository;
-        this.playerRepository = playerRepository; // We add it to the constructor
-        this.playerService = playerService; // NEW: And here
+        this.playerRepository = playerRepository;
+        this.playerService = playerService;
     }
 
-    // ... existing methods ...
+    public List<Task> getTasksByPlayerId(Long playerId) {
+        return taskRepository.findByPlayerId(playerId);
+    }
 
-    // We replace the old createTask method with this one
     public Task createTaskForPlayer(Long playerId, Task task) {
-        // Find the player by their ID
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found"));
         task.setPlayer(player);
         return taskRepository.save(task);
     }
+
     public List<Task> getQuestBoardTasks() {
         List<Task> allQuests = taskRepository.findByPlayerIsNull();
-        Collections.shuffle(allQuests); // Randomize the list
-        return allQuests.stream().limit(4).collect(Collectors.toList()); // Return the first 4
+        Collections.shuffle(allQuests);
+        return allQuests.stream().limit(4).collect(Collectors.toList());
     }
 
-    public List<Task> getAllTasks() {
-        return taskRepository.findAll();
-    }
-    public Task completeTask(Long taskId) {
+    public Player completeTask(Long taskId) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found with id: " + taskId));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
 
-        // Prevent completing a task twice
-        if (task.isCompleted()) {
-            throw new IllegalStateException("Task is already completed.");
-        }
-
-        // Mark task as complete
-        task.setCompleted(true);
-
-        // Award XP and Gold to the player
         Player player = task.getPlayer();
         if (player != null) {
-            playerService.addXpAndGold(player, task.getXpValue(), task.getGoldValue());
+            // Give a fixed 20 XP and 10 Gold for each task.
+            playerService.addXpAndGold(player, 20, 10);
         }
 
-        return taskRepository.save(task);
-    }
-    // Add this method inside your TaskService class
-    public List<Task> getTasksByPlayerId(Long playerId) {
-        return taskRepository.findByPlayerId(playerId);
+        taskRepository.delete(task); // Delete the task after completion
+        return player; // Return the updated player
     }
 }

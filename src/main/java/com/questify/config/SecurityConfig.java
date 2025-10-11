@@ -30,9 +30,8 @@ public class SecurityConfig {
                                 // Allow access to login/signup
                                 .requestMatchers("/api/players/login", "/api/players/create").permitAll()
 
-                                // --- ADD THESE TWO LINES ---
-                                .requestMatchers("/api/tasks/quest-board").permitAll() // For the random quests
-                                .requestMatchers("/api/tasks/player/**").permitAll()   // For the player's personal tasks
+                                // REPLACE your old task rules with this single, more general one
+                                .requestMatchers("/api/tasks/**").permitAll()
 
                                 // Allow access to the H2 console
                                 .requestMatchers("/h2-console/**").permitAll()
