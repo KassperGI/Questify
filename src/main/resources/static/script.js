@@ -37,12 +37,77 @@ document.addEventListener("DOMContentLoaded", () => {
   const newTaskInput = document.getElementById("new-task-input");
   const addTaskButton = document.getElementById("add-task-button");
 
-  // helper: safe class toggles
+  // --- Helper functions for intro/tutorial ---
+  const delay = ms => new Promise(res => setTimeout(res, ms));
+
+  async function startIntro() {
+      const introText = document.getElementById('intro-text');
+
+      // Hide all other main screens
+      startScreen?.classList.add("hidden");
+      gameMenuScreen?.classList.add("hidden");
+      loginScreen?.classList.add("hidden");
+      document.getElementById('game-content-screen')?.classList.add('hidden');
+
+      // Show the intro screen
+      document.getElementById('intro-screen')?.classList.remove('hidden');
+
+      introText.textContent = "In a realm ruled by procrastination...";
+      await delay(3000);
+
+      introText.textContent = "A hero must rise to conquer the ultimate foe...";
+      await delay(3000);
+
+      introText.textContent = "The beast of the Unfinished Task List.";
+      await delay(4000);
+
+      // Hide the intro and show the game screen, then start the tutorial
+      document.getElementById('intro-screen')?.classList.add('hidden');
+      showGameScreen();
+      if (localStorage.getItem('questifyTutorialCompleted') !== 'true') {
+          startTutorial();
+      }
+  }
+
+  async function startTutorial() {
+      const overlay = document.getElementById('tutorial-overlay');
+      const step1 = document.getElementById('tutorial-step-1');
+      const step2 = document.getElementById('tutorial-step-2');
+      const step3 = document.getElementById('tutorial-step-3');
+
+      overlay.classList.remove('hidden');
+      step1.classList.remove('hidden');
+
+      await new Promise(resolve => {
+          step1.querySelector('.tutorial-next').onclick = resolve;
+      });
+
+      step1.classList.add('hidden');
+      step2.classList.remove('hidden');
+
+      await new Promise(resolve => {
+          step2.querySelector('.tutorial-next').onclick = resolve;
+      });
+
+      step2.classList.add('hidden');
+      step3.classList.remove('hidden');
+
+      await new Promise(resolve => {
+          step3.querySelector('.tutorial-finish').onclick = resolve;
+      });
+
+      overlay.classList.add('hidden');
+      step3.classList.add('hidden');
+      localStorage.setItem('questifyTutorialCompleted', 'true');
+  }
+
+  // --- Original helper functions ---
   function showDropdown() {
     if (!profileDropdown || !profileButton) return;
     profileDropdown.classList.add("show");
     profileButton.classList.add("active");
   }
+
   function showGameScreen() {
       startScreen?.classList.add("hidden");
       gameMenuScreen?.classList.add("hidden");
@@ -50,17 +115,19 @@ document.addEventListener("DOMContentLoaded", () => {
       gameContentScreen?.classList.remove("hidden");
       loadGameData();
   }
+
   function hideDropdown() {
     if (!profileDropdown || !profileButton) return;
     profileDropdown.classList.remove("show");
     profileButton.classList.remove("active");
   }
+
   async function loadGameData() {
       const playerString = localStorage.getItem("questifyPlayer");
       if (!playerString) return;
       const player = JSON.parse(playerString);
 
-      // --- Part 1: Update Player Stats ---
+      // Part 1: Update Player Stats
       const playerName = document.getElementById("player-name");
       const playerLevel = document.getElementById("player-level");
       const playerXpText = document.getElementById("player-xp-text");
@@ -74,8 +141,13 @@ document.addEventListener("DOMContentLoaded", () => {
       playerXpText.textContent = `${player.xp} / ${xpNeeded} XP`;
       playerXpFill.style.width = `${(player.xp / xpNeeded) * 100}%`;
 
+      dropdownUsername.textContent = player.username;
+      xpLevelEl.textContent = `Lvl ${player.level}`;
+      dropdownGold.textContent = `Gold: ${player.gold}`;
+      dropdownXpText.textContent = `${player.xp} / ${xpNeeded} XP`;
+      xpBarFill.style.width = `${(player.xp / xpNeeded) * 100}%`;
 
-      // --- Part 2: Fetch BOTH Task Lists ---
+      // Part 2: Fetch BOTH Task Lists
       const taskList = document.getElementById("task-list");
       const questList = document.getElementById("quest-list");
       taskList.innerHTML = "<li>Loading...</li>";
@@ -165,91 +237,89 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // UI update based on localStorage
-  function updateUI() {
-      const playerString = localStorage.getItem("questifyPlayer");
-      if (playerString) {
-          const player = JSON.parse(playerString);
+    function updateUI() {
+        const playerString = localStorage.getItem("questifyPlayer");
+        if (playerString) {
+            const player = JSON.parse(playerString);
 
-          // --- THIS IS THE NEW LOGIC ---
-          // Check if the player has made progress (level > 1)
-          if (player.level > 1) {
-              // Player is returning, show the resume menu
-              startScreen?.classList.add("hidden");
-              gameMenuScreen?.classList.remove("hidden");
-          } else {
-              // Player is new or has no progress, show the start menu
-              startScreen?.classList.remove("hidden");
-              gameMenuScreen?.classList.add("hidden");
-          }
+            // THIS IS THE ORIGINAL, CORRECT LOGIC THAT CHECKS THE PLAYER'S LEVEL
+            if (player.level > 1) {
+                // Player is returning, show the resume menu
+                startScreen?.classList.add("hidden");
+                gameMenuScreen?.classList.remove("hidden");
+            } else {
+                // Player is new or has no progress, show the start menu
+                startScreen?.classList.remove("hidden");
+                gameMenuScreen?.classList.add("hidden");
+            }
 
-          // Hide the login screen since we are logged in
-          loginScreen?.classList.add("hidden");
+            // The rest of the function remains the same
+            loginScreen?.classList.add("hidden");
+            loggedOutView?.classList.add("hidden");
+            loggedInView?.classList.remove("hidden");
 
-          // The rest of the function remains the same
-          loggedOutView?.classList.add("hidden");
-          loggedInView?.classList.remove("hidden");
+            dropdownUsername && (dropdownUsername.textContent = player.username ?? "Player");
+            dropdownGold && (dropdownGold.textContent = `Gold: ${player.gold ?? 0}`);
+            const level = player.level ?? 1;
+            xpLevelEl && (xpLevelEl.textContent = `Lvl ${level}`);
+            const xpNeeded = level * 100;
+            const xp = player.xp ?? 0;
+            const pct = Math.max(0, Math.min(100, (xp / xpNeeded) * 100));
+            xpBarFill && (xpBarFill.style.width = `${pct}%`);
+            dropdownXpText && (dropdownXpText.textContent = `${xp} / ${xpNeeded} XP`);
 
-          // fill dropdown values safely
-          dropdownUsername && (dropdownUsername.textContent = player.username ?? "Player");
-          dropdownGold && (dropdownGold.textContent = `Gold: ${player.gold ?? 0}`);
-          const level = player.level ?? 1;
-          xpLevelEl && (xpLevelEl.textContent = `Lvl ${level}`);
-          const xpNeeded = level * 100;
-          const xp = player.xp ?? 0;
-          const pct = Math.max(0, Math.min(100, (xp / xpNeeded) * 100));
-          xpBarFill && (xpBarFill.style.width = `${pct}%`);
-          dropdownXpText && (dropdownXpText.textContent = `${xp} / ${xpNeeded} XP`);
-
-          hideDropdown();
-      } else {
-          // logged out state
-          startScreen?.classList.remove("hidden");
-          loginScreen?.classList.add("hidden");
-          gameMenuScreen?.classList.add("hidden");
-
-          loggedOutView?.classList.remove("hidden");
-          loggedInView?.classList.add("hidden");
-
-          hideDropdown();
-      }
-  }
+            hideDropdown();
+        } else {
+            // logged out state
+            startScreen?.classList.remove("hidden");
+            loginScreen?.classList.add("hidden");
+            gameMenuScreen?.classList.add("hidden");
+            loggedOutView?.classList.remove("hidden");
+            loggedInView?.classList.add("hidden");
+            hideDropdown();
+        }
+    }
 
   // --- Event listeners ---
-
-  // Show login screen (Start or header login)
   function showLogin() {
     startScreen?.classList.add("hidden");
     gameMenuScreen?.classList.add("hidden");
     loginScreen?.classList.remove("hidden");
     hideDropdown();
   }
+
   startGameButton?.addEventListener("click", () => {
       const playerString = localStorage.getItem("questifyPlayer");
       if (playerString) {
-          // If the player is logged in, go to the main game screen
-          showGameScreen();
+          startIntro();
       } else {
-          // If the player is NOT logged in, show the login form
           showLogin();
       }
   });
+
   loginNavButton?.addEventListener("click", showLogin);
 
-  // Resume Game (go to game content)
-  resumeGameButton?.addEventListener("click", showGameScreen);
+  // MODIFIED CODE: This now starts the intro cinematic
+  // MODIFIED CODE: This now checks if the player is returning
+  resumeGameButton?.addEventListener("click", () => {
+      if (localStorage.getItem('questifyTutorialCompleted') === 'true') {
+          // If they've played before, skip the intro and go straight to the game
+          showGameScreen();
+      } else {
+          // If it's their first time, play the intro
+          startIntro();
+      }
+  });
 
-  // Quit to menu from placeholder game content
   document.getElementById("quit-to-menu")?.addEventListener("click", () => {
     gameContentScreen?.classList.add("hidden");
     gameMenuScreen?.classList.remove("hidden");
   });
 
-  // New game / settings placeholders
   newGameButton?.addEventListener("click", () => alert("Starting a new game!"));
   settingsButton?.addEventListener("click", () => alert("Settings screen goes here!"));
   settingsButtonIngame?.addEventListener("click", () => alert("Settings screen goes here!"));
 
-  // Toggle profile dropdown (click)
   profileButton?.addEventListener("click", (e) => {
     e.stopPropagation();
     if (!profileDropdown) return;
@@ -263,34 +333,27 @@ document.addEventListener("DOMContentLoaded", () => {
           alert("Task description cannot be empty.");
           return;
       }
-
       const playerString = localStorage.getItem("questifyPlayer");
       if (!playerString) return;
       const player = JSON.parse(playerString);
-
       const taskData = { description: description };
-
       try {
           const response = await fetch(`http://localhost:8080/api/tasks/player/${player.id}/create`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(taskData)
           });
-
           if (!response.ok) {
               throw new Error("Failed to add task.");
           }
-
-          newTaskInput.value = ""; // Clear the input box
-          loadGameData(); // Reload the task list to show the new task
-
+          newTaskInput.value = "";
+          loadGameData();
       } catch (error) {
           console.error("Error adding task:", error);
           alert("Could not add task.");
       }
   });
 
-  // Auto-close dropdown on outside click
   document.addEventListener("click", (e) => {
     const clickedInsideDropdown = profileDropdown && profileDropdown.contains(e.target);
     const clickedProfileBtn = profileButton && profileButton.contains(e.target);
@@ -299,31 +362,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Close on Escape
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") hideDropdown();
   });
 
-  // PASTE THIS NEW CODE IN ITS PLACE
   loginForm?.addEventListener("submit", async (e) => {
       e.preventDefault();
       const usernameInput = document.getElementById("username");
       const passwordInput = document.getElementById("password");
-
       const loginData = {
           username: usernameInput?.value?.trim(),
           password: passwordInput?.value,
       };
-
       try {
           const response = await fetch("http://localhost:8080/api/players/login", {
               method: "POST",
-              headers: {
-                  "Content-Type": "application/json",
-              },
+              headers: { "Content-Type": "application/json" },
               body: JSON.stringify(loginData),
           });
-
           if (!response.ok) {
               if (response.status === 404) {
                   alert("User not found. Please click 'Sign Up' to create an account.");
@@ -332,85 +388,69 @@ document.addEventListener("DOMContentLoaded", () => {
               }
               return;
           }
-
           const player = await response.json();
-
           localStorage.setItem("questifyPlayer", JSON.stringify(player));
           alert(`Welcome back, ${player.username}!`);
           updateUI();
-
       } catch (error) {
           console.error("Login Error:", error);
           alert("Could not connect to the server. Please try again later.");
       }
   });
 
-  // Logout
   logoutButton?.addEventListener("click", () => {
     localStorage.removeItem("questifyPlayer");
+    localStorage.removeItem('questifyTutorialCompleted');
     hideDropdown();
     updateUI();
   });
 
   dropdownAchievements?.addEventListener("click", (e) => {
       e.stopPropagation();
-      hideDropdown(); // First, close the profile dropdown
-      achievementsScreen?.classList.remove("hidden"); // Then, show the achievements screen
+      hideDropdown();
+      achievementsScreen?.classList.remove("hidden");
   });
 
-  // ADD this new event listener for the 'Back' button
   achievementsBackButton?.addEventListener("click", () => {
-      achievementsScreen?.classList.add("hidden"); // Hide the achievements screen
+      achievementsScreen?.classList.add("hidden");
   });
 
-  // Back from login
   backButton?.addEventListener("click", () => {
     loginScreen?.classList.add("hidden");
     updateUI();
   });
 
-  // Sign up (CONNECTS TO BACKEND)
-  // Inside script.js
   showSignupButton?.addEventListener("click", async () => {
       const usernameInput = document.getElementById("username");
       const passwordInput = document.getElementById("password");
-
       const newUser = {
           username: usernameInput?.value?.trim(),
           password: passwordInput?.value,
       };
-
       if (!newUser.username || !newUser.password) {
           alert("Username and password cannot be empty.");
           return;
       }
-
       try {
           const response = await fetch("http://localhost:8080/api/players/create", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(newUser),
           });
-
           if (!response.ok) {
-              // THIS PART IS IMPROVED
-              // Read the specific error message from the backend
               const errorData = await response.json();
               throw new Error(errorData.message || "Failed to create account.");
           }
-
           const createdPlayer = await response.json();
           alert(`Account created for ${createdPlayer.username}! You are now logged in.`);
-
           localStorage.setItem("questifyPlayer", JSON.stringify(createdPlayer));
           updateUI();
-
       } catch (error) {
           console.error("Signup Error:", error);
-          alert(error.message); // This will now show the specific message
+          alert(error.message);
       }
   });
-  // Mute / About placeholders
+
   muteButton?.addEventListener("click", () => muteButton.classList.toggle("muted"));
   aboutButton?.addEventListener("click", () => alert("About/Credits screen goes here!"));
 

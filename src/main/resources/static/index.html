@@ -62,7 +62,6 @@
         <button id="back-button">Back</button>
     </div>
 </div>
-</div>
 
 <div id="achievements-screen" class="screen hidden">
     <div class="achievements-container">
@@ -94,8 +93,30 @@
     </div>
 </div>
 
-<div id="game-content-screen" class="screen hidden">
+<div id="intro-screen" class="screen hidden">
+    <div id="intro-character">
+        <div class="head"></div>
+        <div class="body"></div>
+    </div>
+    <p id="intro-text"></p>
+</div>
 
+<div id="tutorial-overlay" class="hidden">
+    <div id="tutorial-step-1" class="tutorial-box hidden">
+        <p>This is your Quest Panel. Add your real-life tasks here to gain XP!</p>
+        <button class="tutorial-next">Next</button>
+    </div>
+    <div id="tutorial-step-2" class="tutorial-box hidden">
+        <p>The Quest Board has pre-made challenges for you to accept.</p>
+        <button class="tutorial-next">Next</button>
+    </div>
+    <div id="tutorial-step-3" class="tutorial-box hidden">
+        <p>Keep an eye on your Hero's progress here. Now, go complete your first quest!</p>
+        <button class="tutorial-finish">Finish</button>
+    </div>
+</div>
+
+<div id="game-content-screen" class="screen hidden">
     <div id="player-panel">
         <h2>Your Hero</h2>
         <div id="player-sprite"></div>
@@ -109,7 +130,6 @@
         <div id="player-xp-text">0 / 100 XP</div>
         <div id="player-gold">Gold: 0</div>
     </div>
-
     <div id="quest-panel">
         <div id="quest-board">
             <h2>Quest Board</h2>
@@ -126,8 +146,8 @@
             </div>
         </div>
     </div>
-
 </div>
+
 <script src="script.js"></script>
 </body>
 </html>
