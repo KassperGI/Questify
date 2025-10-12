@@ -299,17 +299,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   loginNavButton?.addEventListener("click", showLogin);
 
-  // MODIFIED CODE: This now starts the intro cinematic
-  // MODIFIED CODE: This now checks if the player is returning
-  resumeGameButton?.addEventListener("click", () => {
-      if (localStorage.getItem('questifyTutorialCompleted') === 'true') {
-          // If they've played before, skip the intro and go straight to the game
-          showGameScreen();
-      } else {
-          // If it's their first time, play the intro
-          startIntro();
-      }
-  });
+  // MODIFIED CODE: This now always skips the intro and goes straight to the game
+  resumeGameButton?.addEventListener("click", showGameScreen);
 
   document.getElementById("quit-to-menu")?.addEventListener("click", () => {
     gameContentScreen?.classList.add("hidden");
