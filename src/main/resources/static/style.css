@@ -8,7 +8,7 @@
 }
 body {
     font-family: 'Press Start 2P', cursive;
-    background-color: #1a1a2e;
+    background-color: #0d0d1a; /* Deep Space Black */
     color: #ffffff;
     font-family: 'Press Start 2P', cursive;
     text-align: center;
@@ -18,15 +18,15 @@ body {
 
 h1 {
     font-size: 64px;
-    color: #f7b733;
-    text-shadow: 4px 4px #e74c3c;
+    color: #00ff99; /* Neon Green/Cyan */
+    text-shadow: 4px 4px #ff00ff; /* Magenta Glow */
     margin-bottom: 50px;
 }
 
 h2 {
     font-size: 24px;
     color: #f0f0f0;
-    text-shadow: 2px 2px #e74c3c;
+    text-shadow: 2px 2px #ff00ff; /* Magenta Shadow for H2 */
     margin-bottom: 20px;
 }
 
@@ -54,8 +54,8 @@ h2 {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #4e4e6a;
-    border: 2px solid #9a9ac5;
+    background-color: #1a1a2e;
+    border: 2px solid #00ffff;
     color: #e0e0ff;
     position: relative;
     overflow: hidden;
@@ -64,8 +64,8 @@ h2 {
 #login-nav-button, #profile-nav-button {
     font-size: 16px;
     padding: 10px 20px;
-    background-color: #e74c3c;
-    border: 2px solid #f7b733;
+    background-color: #ff00ff; /* Magenta */
+    border: 2px solid #00ffff;
     color: #ffffff;
 }
 
@@ -87,21 +87,21 @@ h2 {
     padding: 20px 40px;
     width: 350px;
     margin-bottom: 20px;
-    background-color: #2c3e50;
-    border: 2px solid #3498db;
-    color: #3498db;
+    background-color: #1a1a2e;
+    border: 2px solid #00ffff;
+    color: #00ffff;
     cursor: pointer;
 }
 
 #new-game-button {
     font-size: 18px;
     width: 300px;
-    background-color: #4e4e6a;
-    border-color: #9a9ac5;
-    color: #9a9ac5;
+    background-color: #1a1a2e;
+    border-color: #ff00ff;
+    color: #ff00ff;
 }
 
-/* --- Universal Hover Effects --- */
+/* --- Universal Hover Effects (Magenta Glow) --- */
 #start-screen button:hover,
 #game-menu-screen button:hover,
 #login-nav-button:hover,
@@ -111,9 +111,16 @@ h2 {
 #back-button:hover,
 #show-signup-button:hover,
 #login-main-button:hover,
-#dropdown-achievements:hover {
-    background-color: #3498db;
-    color: #ffffff;
+#dropdown-achievements:hover,
+#achievements-back-button:hover,
+#add-task-button:hover,
+#start-shooter-button:hover,
+.complete-btn:hover,
+.accept-btn:hover,
+#return-to-tasks-button:hover {
+    background-color: #ff00ff; /* Magenta */
+    color: #0d0d1a; /* Dark text on bright button */
+    border-color: #00ffff;
 }
 
 .hidden {
@@ -122,9 +129,9 @@ h2 {
 
 /* --- Login Screen Styles --- */
 .login-container {
-    background-color: rgba(44, 62, 80, 0.7);
+    background-color: rgba(13, 13, 26, 0.7);
     padding: 40px;
-    border: 2px solid #3498db;
+    border: 2px solid #00ffff;
 }
 
 #login-screen form {
@@ -142,8 +149,8 @@ h2 {
     padding: 10px;
     margin-top: 5px;
     margin-bottom: 20px;
-    background-color: #1a1a2e;
-    border: 2px solid #3498db;
+    background-color: #0d0d1a;
+    border: 2px solid #00ffff;
     color: #ffffff;
     font-family: 'Press Start 2P', cursive;
     text-align: center;
@@ -159,15 +166,15 @@ h2 {
 }
 
 #login-main-button {
-    background-color: #2c3e50;
-    border: 2px solid #3498db;
-    color: #3498db;
+    background-color: #1a1a2e;
+    border: 2px solid #00ffff;
+    color: #00ffff;
 }
 
 #show-signup-button {
-    background-color: #4e4e6a;
-    border: 2px solid #9a9ac5;
-    color: #e0e0ff;
+    background-color: #1a1a2e;
+    border: 2px solid #ff00ff;
+    color: #ff00ff;
 }
 
 #back-button {
@@ -175,8 +182,8 @@ h2 {
     width: 150px;
     padding: 10px 20px;
     font-size: 16px;
-    background-color: #e74c3c;
-    border: 2px solid #f7b733;
+    background-color: #ff00ff;
+    border: 2px solid #00ffff;
     color: #ffffff;
     cursor: pointer;
     margin-top: 10px;
@@ -188,8 +195,8 @@ h2 {
     top: 60px;
     right: 0;
     width: 280px;
-    background-color: #2c3e50;
-    border: 2px solid #3498db;
+    background-color: #1a1a2e;
+    border: 2px solid #00ffff;
     padding: 15px;
     display: flex;
     flex-direction: column;
@@ -211,9 +218,9 @@ h2 {
 
 #dropdown-username {
     font-size: 14px;
-    color: #f7b733;
+    color: #00ff99;
     text-align: center;
-    border-bottom: 2px solid #3498db;
+    border-bottom: 2px solid #00ffff;
     padding-bottom: 10px;
 }
 
@@ -231,12 +238,12 @@ h2 {
 .xp-bar-horizontal {
     width: 100%;
     height: 20px;
-    border: 2px solid #9a9ac5;
-    background-color: #1a1a2e;
+    border: 2px solid #ff00ff;
+    background-color: #0d0d1a;
 }
 
 #xp-bar-fill {
-    background-color: #3498db;
+    background-color: #00ffff;
     height: 100%;
     width: 0%; /* JS will change this */
 }
@@ -249,14 +256,14 @@ h2 {
 #dropdown-achievements, #logout-button {
     font-size: 14px;
     padding: 8px;
-    background-color: #4e4e6a;
-    border: 2px solid #9a9ac5;
-    color: #e0e0ff;
+    background-color: #1a1a2e;
+    border: 2px solid #ff00ff;
+    color: #00ffff;
 }
 
 /* --- Mute Button Icon Styles --- */
 #mute-button::before {
-    content: '🎵';
+    content: '🔊'; /* Speaker Icon */
     position: absolute;
     top: 50%;
     left: 50%;
@@ -271,15 +278,15 @@ h2 {
     left: 50%;
     width: 70%;
     height: 4px;
-    background-color: #e74c3c;
-    border: 1px solid #1a1a2e;
+    background-color: #ff00ff;
+    border: 1px solid #0d0d1a;
     transform: translate(-50%, -50%) rotate(45deg);
 }
 /* --- Achievements Screen --- */
 .achievements-container {
-    background-color: rgba(44, 62, 80, 0.85);
+    background-color: rgba(13, 13, 26, 0.85);
     padding: 30px 40px;
-    border: 2px solid #3498db;
+    border: 2px solid #00ffff;
     width: 600px;
     max-height: 80vh;
     display: flex;
@@ -297,8 +304,8 @@ h2 {
 .achievement-item {
     display: flex;
     align-items: center;
-    background-color: #1a1a2e;
-    border: 2px solid #4e4e6a;
+    background-color: #0d0d1a;
+    border: 2px solid #1a1a2e;
     padding: 15px;
     margin-bottom: 15px;
 }
@@ -314,13 +321,13 @@ h2 {
 
 .achievement-title {
     font-size: 16px;
-    color: #f7b733;
+    color: #00ff99;
     margin-bottom: 5px;
 }
 
 .achievement-desc {
     font-size: 12px;
-    color: #9a9ac5;
+    color: #ff00ff;
 }
 
 /* Styling for locked vs. unlocked items */
@@ -329,7 +336,7 @@ h2 {
 }
 
 .achievement-item.unlocked .achievement-icon {
-    filter: drop-shadow(0 0 5px #f7b733);
+    filter: drop-shadow(0 0 5px #00ff99);
 }
 
 #achievements-back-button {
@@ -337,18 +344,14 @@ h2 {
     width: 150px;
     padding: 10px 20px;
     font-size: 16px;
-    background-color: #e74c3c;
-    border: 2px solid #f7b733;
+    background-color: #ff00ff;
+    border: 2px solid #00ffff;
     color: #ffffff;
     cursor: pointer;
     margin-top: 10px;
     align-self: center; /* Centers the button */
 }
 
-#achievements-back-button:hover {
-    background-color: #3498db;
-    color: #ffffff;
-}
 /* --- Main Game Screen --- */
 #game-content-screen {
     display: flex;
@@ -361,8 +364,8 @@ h2 {
 }
 
 #player-panel, #quest-panel {
-    background-color: rgba(44, 62, 80, 0.7);
-    border: 2px solid #3498db;
+    background-color: rgba(13, 13, 26, 0.7);
+    border: 2px solid #00ffff;
     padding: 20px;
 }
 
@@ -377,8 +380,8 @@ h2 {
 #player-sprite {
     width: 150px;
     height: 150px;
-    background-color: #1a1a2e;
-    border: 2px solid #9a9ac5;
+    background-color: #0d0d1a;
+    border: 2px solid #ff00ff;
     margin-bottom: 20px;
     display: flex;
     align-items: center;
@@ -386,12 +389,13 @@ h2 {
     font-size: 80px;
 }
 #player-sprite::after {
-    content: '👤'; /* Placeholder character sprite */
+    content: '🚀'; /* Rocket Ship Sprite */
+    color: #00ff99;
 }
 
 #player-name {
     font-size: 20px;
-    color: #f7b733;
+    color: #00ff99;
     margin-bottom: 20px;
 }
 
@@ -409,13 +413,13 @@ h2 {
 .xp-bar {
     flex-grow: 1;
     height: 25px;
-    border: 2px solid #9a9ac5;
-    background-color: #1a1a2e;
+    border: 2px solid #ff00ff;
+    background-color: #0d0d1a;
 }
 
 #player-xp-fill {
     height: 100%;
-    background-color: #3498db;
+    background-color: #00ffff;
 }
 
 #player-xp-text, #player-gold {
@@ -438,7 +442,7 @@ h2 {
     list-style: none;
     padding: 0;
     margin-top: 15px;
-    border: 2px solid #1a1a2e;
+    border: 2px solid #0d0d1a;
     padding: 10px;
     background-color: rgba(0,0,0,0.2);
 }
@@ -451,8 +455,8 @@ h2 {
 #new-task-input {
     flex-grow: 1;
     padding: 10px;
-    background-color: #1a1a2e;
-    border: 2px solid #3498db;
+    background-color: #0d0d1a;
+    border: 2px solid #00ffff;
     color: #ffffff;
     font-family: 'Press Start 2P', cursive;
     font-size: 14px;
@@ -462,32 +466,29 @@ h2 {
     width: 50px;
     height: 50px;
     font-size: 30px;
-    border: 2px solid #3498db;
-    background-color: #2c3e50;
-    color: #3498db;
+    border: 2px solid #00ffff;
+    background-color: #1a1a2e;
+    color: #00ffff;
     cursor: pointer;
 }
-#add-task-button:hover {
-    background-color: #3498db;
-    color: #ffffff;
-}
+
 /* --- Task Item Styling --- */
 .task-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #2c3e50;
+    background-color: #1a1a2e;
     padding: 15px;
-    border: 1px solid #4e4e6a;
+    border: 1px solid #ff00ff;
     margin-bottom: 10px;
     text-align: left; /* Aligns task text to the left */
 }
 
 .complete-btn {
     font-family: 'Press Start 2P', cursive;
-    background-color: #27ae60;
-    color: white;
-    border: 1px solid #2ecc71;
+    background-color: #00ff99; /* Neon Green */
+    color: black;
+    border: 1px solid #00ffff;
     cursor: pointer;
     width: 40px;
     height: 40px;
@@ -495,52 +496,30 @@ h2 {
     flex-shrink: 0; /* Prevents the button from shrinking */
 }
 
-.complete-btn:hover {
-    background-color: #2ecc71;
-}
-
 .accept-btn {
     font-family: 'Press Start 2P', cursive;
-    background-color: #3498db;
+    background-color: #ff00ff; /* Magenta */
     color: white;
-    border: 1px solid #9a9ac5;
+    border: 1px solid #00ffff;
     cursor: pointer;
     padding: 5px 10px;
     font-size: 12px;
 }
-.accept-btn:hover {
-    background-color: #4e9fe1;
-}
 
-.task-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #2c3e50;
-    padding: 15px;
-    border: 1px solid #4e4e6a;
-    margin-bottom: 10px;
-    text-align: left;
-}
-
-.complete-btn {
+/* New button on task page */
+#start-shooter-button {
     font-family: 'Press Start 2P', cursive;
-    background-color: #27ae60;
-    color: white;
-    border: 1px solid #2ecc71;
+    font-size: 24px;
+    padding: 15px 30px;
+    background-color: #1a1a2e;
+    border: 2px solid #00ff99;
+    color: #00ff99;
     cursor: pointer;
-    width: 40px;
-    height: 40px;
-    font-size: 20px;
-    flex-shrink: 0;
-}
-.complete-btn:hover {
-    background-color: #2ecc71;
 }
 
 /* --- Intro Screen & Character --- */
 #intro-screen {
-    background-color: #000; /* A cinematic black background */
+    background-color: #000;
     justify-content: center;
     align-items: center;
 }
@@ -549,13 +528,13 @@ h2 {
     position: relative;
     width: 60px;
     height: 110px;
-    animation: bobbing 2s infinite ease-in-out; /* Add a gentle idle animation */
+    animation: bobbing 2s infinite ease-in-out;
 }
 
 #intro-character .head {
     width: 60px;
     height: 60px;
-    background-color: #ffcc99; /* Skin tone */
+    background-color: #00ff99; /* Neon */
     border-radius: 10px;
     position: absolute;
     top: 0;
@@ -564,7 +543,7 @@ h2 {
 #intro-character .body {
     width: 60px;
     height: 50px;
-    background-color: #4a4e69; /* Tunic color */
+    background-color: #ff00ff; /* Magenta */
     position: absolute;
     top: 60px;
 }
@@ -574,9 +553,9 @@ h2 {
     bottom: 15%;
     width: 80%;
     font-size: 20px;
-    color: #f0f0f0;
+    color: #00ffff;
     text-align: center;
-    min-height: 50px; /* Reserve space for text */
+    min-height: 50px;
 }
 
 /* --- Animations --- */
@@ -592,14 +571,14 @@ h2 {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7); /* Dark semi-transparent overlay */
-    z-index: 2000; /* Make sure it's on top of everything */
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 2000;
 }
 
 .tutorial-box {
     position: absolute;
-    background-color: #2c3e50;
-    border: 2px solid #3498db;
+    background-color: #1a1a2e;
+    border: 2px solid #00ffff;
     padding: 20px;
     width: 300px;
     text-align: center;
@@ -611,7 +590,45 @@ h2 {
     cursor: pointer;
 }
 
-/* Position each tutorial step */
+/* Position each tutorial step (adjusted for the new theme flow) */
 #tutorial-step-1 { top: 120px; right: 25%; }
 #tutorial-step-2 { top: 350px; right: 25%; }
 #tutorial-step-3 { top: 120px; left: 25%; }
+
+/* --- Shooter Game Canvas and Overlay --- */
+#shooter-game-screen {
+    position: relative;
+    padding-top: 50px; /* Offset from top nav */
+    min-height: 100vh;
+}
+
+#game-canvas {
+    background-color: #0d0d1a;
+    border: 4px solid #00ffff;
+    image-rendering: pixelated;
+    box-shadow: 0 0 15px #00ffff; /* Subtle glow */
+}
+
+#game-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.9);
+    border: 4px solid #ff00ff;
+    padding: 40px;
+    width: 300px;
+    z-index: 1000;
+}
+
+#return-to-tasks-button {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 16px;
+    padding: 15px 30px;
+    margin-top: 20px;
+    background-color: #1a1a2e;
+    border: 2px solid #00ffff;
+    color: #00ffff;
+    cursor: pointer;
+    width: 100%;
+}

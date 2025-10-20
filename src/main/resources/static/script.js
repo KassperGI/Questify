@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const startScreen = document.getElementById("start-screen");
   const loginScreen = document.getElementById("login-screen");
   const gameMenuScreen = document.getElementById("game-menu-screen");
-  const gameContentScreen = document.getElementById("game-content");
+  const gameContentScreen = document.getElementById("game-content-screen"); // Corrected ID
 
   const startGameButton = document.getElementById("start-game-button");
   const resumeGameButton = document.getElementById("resume-game-button");
@@ -30,12 +30,57 @@ document.addEventListener("DOMContentLoaded", () => {
   const dropdownGold = document.getElementById("dropdown-gold");
 
   const dropdownAchievements = document.getElementById("dropdown-achievements");
-  console.log("Found Achievements Button:", dropdownAchievements);
   const achievementsScreen = document.getElementById("achievements-screen");
   const achievementsBackButton = document.getElementById("achievements-back-button");
 
   const newTaskInput = document.getElementById("new-task-input");
   const addTaskButton = document.getElementById("add-task-button");
+
+  // --- NEW SHOOTER GAME ELEMENTS ---
+  const shooterGameScreen = document.getElementById("shooter-game-screen");
+  const gameCanvas = document.getElementById("game-canvas");
+  const ctx = gameCanvas ? gameCanvas.getContext("2d") : null;
+  const returnToTasksButton = document.getElementById("return-to-tasks-button");
+  const startShooterButton = document.getElementById("start-shooter-button");
+
+  let gameInterval = null;
+  let keys = {}; // To track pressed keys for continuous movement
+
+  // --- GAME STATE ---
+  let playerShip = {};
+  let asteroids = [];
+  let lasers = [];
+  let aliens = [];
+  let score = 0;
+  let gameOver = false;
+  let lastSpawnTime = 0; // For controlling enemy spawn rate
+  const INITIAL_HP = 3; // Base HP before level upgrades
+
+  // --- GAME CONFIG (Level-Based Upgrades) ---
+  const SHIP_CONFIG = (level) => {
+      // Base stats (Level 1)
+      let config = {
+          speed: 5,
+          hp: INITIAL_HP,
+          fireRate: 200, // ms between shots
+          laserCount: 1, // Lasers per shot
+          laserSpeed: 10
+      };
+
+      // Apply Upgrades based on RPG Level
+      if (level > 1) {
+          config.speed += (level - 1) * 0.5; // +0.5 speed per level
+      }
+      if (level >= 5) {
+          config.hp++; // +1 HP at level 5
+      }
+      if (level >= 10) {
+          config.laserCount = 2; // Double laser at level 10
+          config.fireRate = 150; // Faster fire rate
+      }
+
+      return config;
+  };
 
   // --- Helper functions for intro/tutorial ---
   const delay = ms => new Promise(res => setTimeout(res, ms));
@@ -47,26 +92,24 @@ document.addEventListener("DOMContentLoaded", () => {
       startScreen?.classList.add("hidden");
       gameMenuScreen?.classList.add("hidden");
       loginScreen?.classList.add("hidden");
-      document.getElementById('game-content-screen')?.classList.add('hidden');
+      gameContentScreen?.classList.add('hidden');
+      shooterGameScreen?.classList.add('hidden'); // Ensure shooter game is hidden initially
 
       // Show the intro screen
       document.getElementById('intro-screen')?.classList.remove('hidden');
 
-      introText.textContent = "In a realm ruled by procrastination...";
+      introText.textContent = "In the year 3025, the galaxy is ruled by procrastination...";
       await delay(3000);
 
-      introText.textContent = "A hero must rise to conquer the ultimate foe...";
+      introText.textContent = "A lone pilot must rise to conquer the ultimate foe...";
       await delay(3000);
 
-      introText.textContent = "The beast of the Unfinished Task List.";
+      introText.textContent = "The beast of the Unfinished Task List: ZY'GON.";
       await delay(4000);
 
-      // Hide the intro and show the game screen, then start the tutorial
+      // Hide the intro and start the shooter game
       document.getElementById('intro-screen')?.classList.add('hidden');
-      showGameScreen();
-      if (localStorage.getItem('questifyTutorialCompleted') !== 'true') {
-          startTutorial();
-      }
+      startGameShooter();
   }
 
   async function startTutorial() {
@@ -109,11 +152,17 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function showGameScreen() {
+      // Show the task page
       startScreen?.classList.add("hidden");
       gameMenuScreen?.classList.add("hidden");
-      const gameContentScreen = document.getElementById("game-content-screen");
+      shooterGameScreen?.classList.add("hidden"); // Ensure game is hidden
       gameContentScreen?.classList.remove("hidden");
       loadGameData();
+
+      // Tutorial logic: show only after the first game session (if not completed)
+      if (localStorage.getItem('questifyTutorialCompleted') !== 'true') {
+          startTutorial();
+      }
   }
 
   function hideDropdown() {
@@ -122,6 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
     profileButton.classList.remove("active");
   }
 
+  // ... (loadGameData function remains unchanged) ...
   async function loadGameData() {
       const playerString = localStorage.getItem("questifyPlayer");
       if (!playerString) return;
@@ -168,7 +218,7 @@ document.addEventListener("DOMContentLoaded", () => {
           // Display "My Tasks"
           taskList.innerHTML = "";
           if (myTasks.length === 0) {
-              taskList.innerHTML = "<li>No active tasks. Add one below!</li>";
+              taskList.innerHTML = "<li>No active objectives. Input one below!</li>";
           } else {
               myTasks.forEach(task => {
                   const li = document.createElement("li");
@@ -183,13 +233,13 @@ document.addEventListener("DOMContentLoaded", () => {
                           const completeResponse = await fetch(`http://localhost:8080/api/tasks/${task.id}/complete`, {
                               method: 'POST'
                           });
-                          if (!completeResponse.ok) throw new Error('Failed to complete task.');
+                          if (!completeResponse.ok) throw new Error('Failed to complete objective.');
                           const updatedPlayer = await completeResponse.json();
                           localStorage.setItem('questifyPlayer', JSON.stringify(updatedPlayer));
                           loadGameData();
                       } catch (error) {
                           console.error('Error completing task:', error);
-                          alert('Could not complete the task.');
+                          alert('Could not complete the objective.');
                       }
                    });
                   li.appendChild(taskText);
@@ -201,7 +251,7 @@ document.addEventListener("DOMContentLoaded", () => {
           // Display "Quest Board"
           questList.innerHTML = "";
           if (questBoardTasks.length === 0) {
-              questList.innerHTML = "<li>No quests available right now.</li>";
+              questList.innerHTML = "<li>No missions available right now.</li>";
           } else {
               questBoardTasks.forEach(quest => {
                   const li = document.createElement("li");
@@ -221,7 +271,7 @@ document.addEventListener("DOMContentLoaded", () => {
                       if (response.ok) {
                           loadGameData();
                       } else {
-                          alert("Failed to accept quest.");
+                          alert("Failed to accept mission.");
                       }
                   });
                   li.appendChild(questText);
@@ -231,10 +281,11 @@ document.addEventListener("DOMContentLoaded", () => {
           }
       } catch (error) {
           console.error("Error loading data:", error);
-          taskList.innerHTML = "<li>Error loading tasks.</li>";
-          questList.innerHTML = "<li>Error loading quests.</li>";
+          taskList.innerHTML = "<li>Error loading objectives.</li>";
+          questList.innerHTML = "<li>Error loading missions.</li>";
       }
   }
+
 
   // UI update based on localStorage
     function updateUI() {
@@ -242,7 +293,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (playerString) {
             const player = JSON.parse(playerString);
 
-            // THIS IS THE ORIGINAL, CORRECT LOGIC THAT CHECKS THE PLAYER'S LEVEL
             if (player.level > 1) {
                 // Player is returning, show the resume menu
                 startScreen?.classList.add("hidden");
@@ -280,6 +330,205 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+  // --- SHOOTER GAME LOGIC ---
+
+  function initializeShip() {
+    const playerString = localStorage.getItem("questifyPlayer");
+    const player = JSON.parse(playerString);
+    const config = SHIP_CONFIG(player.level || 1); // Get upgraded stats
+
+    playerShip = {
+        x: gameCanvas.width / 2,
+        y: gameCanvas.height - 50,
+        width: 30,
+        height: 30,
+        color: '#00ff99', // Neon Green/Cyan
+        ...config,
+        lastShotTime: 0,
+        currentHp: config.hp, // Use currentHp for in-game health
+    };
+    asteroids = [];
+    aliens = [];
+    lasers = [];
+    score = 0;
+  }
+
+  function drawPixelBox(x, y, w, h, color) {
+      if (!ctx) return;
+      ctx.fillStyle = color;
+      ctx.fillRect(x, y, w, h);
+  }
+
+  function drawShip() {
+      // Simple pixelated spaceship (a block)
+      drawPixelBox(playerShip.x - playerShip.width / 2, playerShip.y - playerShip.height / 2, playerShip.width, playerShip.height, playerShip.color);
+
+      // Draw HP/Shields (as a simple pixel bar)
+      const hpBarWidth = 8;
+      const hpBarSpacing = 12;
+      for (let i = 0; i < playerShip.currentHp; i++) {
+          drawPixelBox(playerShip.x - (playerShip.hp * hpBarSpacing / 2) + (i * hpBarSpacing), playerShip.y + 20, hpBarWidth, 4, '#ff00ff');
+      }
+  }
+
+  function drawGameObjects() {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+      // Draw Ship
+      drawShip();
+
+      // Draw Lasers
+      lasers.forEach(l => drawPixelBox(l.x, l.y, 4, 10, '#ff00ff'));
+
+      // Draw Asteroids (White)
+      asteroids.forEach(a => drawPixelBox(a.x, a.y, a.size, a.size, '#ffffff'));
+
+      // Draw Aliens (Red)
+      aliens.forEach(a => drawPixelBox(a.x, a.y, 20, 20, '#e74c3c'));
+  }
+
+  function updateShip() {
+      // ASWD Movement control
+      if (keys['a']) playerShip.x = Math.max(playerShip.x - playerShip.speed, playerShip.width / 2);
+      if (keys['d']) playerShip.x = Math.min(playerShip.x + playerShip.speed, gameCanvas.width - playerShip.width / 2);
+      if (keys['w']) playerShip.y = Math.max(playerShip.y - playerShip.speed, playerShip.height / 2);
+      if (keys['s']) playerShip.y = Math.min(playerShip.y + playerShip.speed, gameCanvas.height - playerShip.height / 2);
+
+      // Firing logic
+      if (keys[' '] && Date.now() > playerShip.lastShotTime + playerShip.fireRate) {
+          // Player Ship Laser Firing
+          for (let i = 0; i < playerShip.laserCount; i++) {
+              let offset = 0;
+              if (playerShip.laserCount > 1) {
+                  offset = (i === 0) ? -8 : 8; // Offset for double lasers
+              }
+              lasers.push({
+                  x: playerShip.x + offset,
+                  y: playerShip.y - playerShip.height/2,
+                  speed: playerShip.laserSpeed
+              });
+          }
+          playerShip.lastShotTime = Date.now();
+      }
+  }
+
+  function updateGameObjects() {
+      // Move lasers
+      lasers = lasers.filter(l => (l.y -= l.speed) > 0);
+
+      // Simple Asteroid Spawning (and alien spawning logic can be added here)
+      const now = Date.now();
+      if (now > lastSpawnTime + 1000) { // Spawn every second
+          if (Math.random() < 0.5) { // 50% chance for asteroid
+              asteroids.push({
+                  x: Math.random() * gameCanvas.width,
+                  y: -20,
+                  speed: Math.random() * 2 + 1,
+                  size: 10 + Math.random() * 10
+              });
+          } else { // 50% chance for alien
+              aliens.push({
+                  x: Math.random() * gameCanvas.width,
+                  y: -20,
+                  speed: Math.random() * 1 + 0.5,
+                  hp: 1
+              });
+          }
+          lastSpawnTime = now;
+      }
+
+      // Move enemies/asteroids
+      asteroids = asteroids.filter(a => (a.y += a.speed) < gameCanvas.height);
+      aliens = aliens.filter(a => (a.y += a.speed) < gameCanvas.height);
+
+      // --- Simple Collision Detection ---
+      // 1. Lasers vs Aliens/Asteroids
+      for (let i = lasers.length - 1; i >= 0; i--) {
+          const laser = lasers[i];
+
+          // Check for Alien hit
+          for (let j = aliens.length - 1; j >= 0; j--) {
+              const alien = aliens[j];
+              // Basic rectangular collision check (replace with better logic in a full game)
+              if (laser.x < alien.x + 20 && laser.x + 4 > alien.x &&
+                  laser.y < alien.y + 20 && laser.y + 10 > alien.y) {
+
+                  score += 10;
+                  aliens.splice(j, 1); // Remove alien
+                  lasers.splice(i, 1); // Remove laser
+                  i--; // Adjust outer loop index after splice
+                  break;
+              }
+          }
+
+          // Check for Asteroid hit (if laser still exists)
+          if (i >= 0) {
+              for (let j = asteroids.length - 1; j >= 0; j--) {
+                  const asteroid = asteroids[j];
+                  if (laser.x < asteroid.x + asteroid.size && laser.x + 4 > asteroid.x &&
+                      laser.y < asteroid.y + asteroid.size && laser.y + 10 > asteroid.y) {
+
+                      asteroids.splice(j, 1); // Destroy asteroid
+                      lasers.splice(i, 1); // Remove laser
+                      i--; // Adjust outer loop index
+                      break;
+                  }
+              }
+          }
+      }
+
+      // 2. Ship vs Aliens/Asteroids (simple damage model)
+      [...asteroids, ...aliens].forEach((enemy, index, array) => {
+          // Ship collision
+          if (playerShip.x - playerShip.width/2 < enemy.x + (enemy.size || 20) && playerShip.x + playerShip.width/2 > enemy.x &&
+              playerShip.y - playerShip.height/2 < enemy.y + (enemy.size || 20) && playerShip.y + playerShip.height/2 > enemy.y) {
+
+              playerShip.currentHp--; // Take damage
+              array.splice(index, 1); // Remove enemy
+          }
+      });
+  }
+
+
+  function gameLoop() {
+      if (gameOver) {
+          clearInterval(gameInterval);
+          document.getElementById('game-overlay').classList.remove('hidden');
+          return;
+      }
+
+      updateShip();
+      updateGameObjects();
+      drawGameObjects();
+
+      // Check if player HP is zero
+      if (playerShip.currentHp <= 0) {
+          gameOver = true;
+          // You would send the score to the backend here for XP/Gold rewards
+          document.getElementById('game-score').textContent = `SCORE: ${score}`;
+      }
+  }
+
+  // --- SCREEN TRANSITIONS & EVENTS ---
+
+  function startGameShooter() {
+      const screens = document.querySelectorAll('.screen');
+      screens.forEach(s => s.classList.add('hidden'));
+
+      shooterGameScreen?.classList.remove('hidden');
+      document.getElementById('game-overlay').classList.add('hidden');
+
+      // Reset game state
+      gameOver = false;
+      initializeShip();
+
+      // Start the game loop
+      if (gameInterval) clearInterval(gameInterval);
+      gameInterval = setInterval(gameLoop, 1000 / 60); // 60 FPS
+  }
+
+
   // --- Event listeners ---
   function showLogin() {
     startScreen?.classList.add("hidden");
@@ -291,7 +540,7 @@ document.addEventListener("DOMContentLoaded", () => {
   startGameButton?.addEventListener("click", () => {
       const playerString = localStorage.getItem("questifyPlayer");
       if (playerString) {
-          startIntro();
+          startIntro(); // Start the intro, which leads to the shooter game
       } else {
           showLogin();
       }
@@ -299,8 +548,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   loginNavButton?.addEventListener("click", showLogin);
 
-  // MODIFIED CODE: This now always skips the intro and goes straight to the game
-  resumeGameButton?.addEventListener("click", showGameScreen);
+  resumeGameButton?.addEventListener("click", startGameShooter); // Resume leads straight to game
 
   document.getElementById("quit-to-menu")?.addEventListener("click", () => {
     gameContentScreen?.classList.add("hidden");
@@ -321,7 +569,7 @@ document.addEventListener("DOMContentLoaded", () => {
   addTaskButton?.addEventListener("click", async () => {
       const description = newTaskInput.value.trim();
       if (!description) {
-          alert("Task description cannot be empty.");
+          alert("Objective description cannot be empty.");
           return;
       }
       const playerString = localStorage.getItem("questifyPlayer");
@@ -335,15 +583,25 @@ document.addEventListener("DOMContentLoaded", () => {
               body: JSON.stringify(taskData)
           });
           if (!response.ok) {
-              throw new Error("Failed to add task.");
+              throw new Error("Failed to add objective.");
           }
           newTaskInput.value = "";
           loadGameData();
       } catch (error) {
           console.error("Error adding task:", error);
-          alert("Could not add task.");
+          alert("Could not add objective.");
       }
   });
+
+  // Connect the new "CONTINUE MISSION" button on the task page
+  startShooterButton?.addEventListener('click', startGameShooter);
+
+  // Connect the "RETURN TO BASE" button on game over
+  returnToTasksButton?.addEventListener('click', () => {
+      shooterGameScreen?.classList.add('hidden');
+      showGameScreen(); // Function that shows the task page (game-content-screen)
+  });
+
 
   document.addEventListener("click", (e) => {
     const clickedInsideDropdown = profileDropdown && profileDropdown.contains(e.target);
@@ -356,6 +614,29 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") hideDropdown();
   });
+
+  // --- Keyboard input for Shooter Game (ASWD and Space) ---
+  document.addEventListener('keydown', (e) => {
+      // Only handle input if the shooter screen is active
+      if (shooterGameScreen && !shooterGameScreen.classList.contains('hidden')) {
+          const key = e.key.toLowerCase();
+          if (key === 'a' || key === 's' || key === 'w' || key === 'd' || key === ' ') {
+              keys[key] = true;
+              if (key === ' ') e.preventDefault(); // Prevent spacebar from scrolling page
+          }
+      }
+  });
+
+  document.addEventListener('keyup', (e) => {
+      if (shooterGameScreen && !shooterGameScreen.classList.contains('hidden')) {
+          const key = e.key.toLowerCase();
+          if (key === 'a' || key === 's' || key === 'w' || key === 'd' || key === ' ') {
+              keys[key] = false;
+          }
+      }
+  });
+  // --- End Shooter Input ---
+
 
   loginForm?.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -373,7 +654,7 @@ document.addEventListener("DOMContentLoaded", () => {
           });
           if (!response.ok) {
               if (response.status === 404) {
-                  alert("User not found. Please click 'Sign Up' to create an account.");
+                  alert("Pilot not found. Please click 'Sign Up' to create an account.");
               } else {
                   alert("Invalid username or password.");
               }
@@ -381,7 +662,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
           const player = await response.json();
           localStorage.setItem("questifyPlayer", JSON.stringify(player));
-          alert(`Welcome back, ${player.username}!`);
+          alert(`Welcome back, Commander ${player.username}!`);
           updateUI();
       } catch (error) {
           console.error("Login Error:", error);
